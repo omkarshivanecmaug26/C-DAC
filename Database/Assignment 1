@@ -1,0 +1,153 @@
+mysql> /* 1. Define a schema for a Library Management System with the following entities:
+/*>  - Books
+/*>  - Authors
+/*>  - Members
+/*>  - Borrow_Records */
+mysql> CREATE DATABASE Library_Management_System;
+mysql> USE Library_Management_System;
+Database changed
+
+mysql> /* 2. Write the SQL command to create a table Authors with the following fields:
+   /*>  - author_id (Primary Key, INT)
+   /*>  - name (VARCHAR(100))
+   /*>  - country (VARCHAR(50)) */
+mysql> CREATE TABLE Authors (author_id Int Primary Key, name VARCHAR(100), country VARCHAR(50));
+
+mysql> /* 3. Write the SQL command to create a table Books with the following fields:
+   /*>  - book_id (Primary Key, INT)
+   /*>  - title (VARCHAR(150))
+   /*>  - author_id (Foreign Key referencing Authors)
+   /*>  - published_year (YEAR)
+   /*>  - available_copies (INT) */
+mysql> CREATE TABLE Books (
+    -> book_id INT PRIMARY KEY,
+    -> title VARCHAR(150),
+    -> author_id INT,
+    -> published_year YEAR,
+    -> available_copies INT,
+    -> FOREIGN KEY (author_id) REFERENCES Authors(author_id)
+    -> );
+
+mysql> /* 4. Write the SQL command to create a table Members with:
+   /*>  - member_id (Primary Key, INT)
+   /*>  - name (VARCHAR(100))
+   /*>  - email (VARCHAR(100), unique)
+   /*>  - phone (VARCHAR(1)) */
+mysql> CREATE TABLE Members (
+    -> member_id INT PRIMARY KEY,
+    -> name VARCHAR(100),
+    -> email VARCHAR(100) UNIQUE,
+    -> phone VARCHAR(1)
+    -> );
+
+mysql> /* 5. Write the SQL command to create a table Borrow_Records with:
+   /*>  - record_id (Primary Key, INT)
+   /*>  - member_id (Foreign Key referencing Members)
+   /*>  - book_id (Foreign Key referencing Books)
+   /*>  - borrow_date (DATE)
+   /*>  - return_date (DATE) */
+mysql> CREATE TABLE Borrow_Records (
+    -> record_id INT PRIMARY KEY,
+    -> member_id INT,
+    -> book_id INT,
+    -> borrow_date DATE,
+    -> return_date DATE,
+    -> FOREIGN KEY (member_id) REFERENCES Members (member_id),
+    -> FOREIGN KEY (book_id) REFERENCES Books (book_id)
+    -> );
+
+mysql> /* 6. Modify the Books table to add a column genre of type VARCHAR(50) */
+mysql> ALTER TABLE Books ADD genre VARCHAR(50);
+
+mysql> /* 7. Write the SQL command to drop the Borrow_Records table */
+mysql> DROP TABLE Borrow_Records;
+
+mysql> /* 8. Insert 3 records into the Authors table */
+mysql> INSERT INTO Authors (author_id, name, country)
+    -> VALUES
+    -> (1, 'O. kamble', 'India'),
+    -> (2, 'P. Bairagi', 'Germany'),
+    -> (3, 'N. Yadav', 'USA');
+
+mysql> /* 9. Insert 5 books into the Books table */
+mysql> INSERT INTO Books(book_id, title, author_id, published_year, available_copies, genre)
+    -> VALUES
+    -> (101, 'Wings of Fire', 1, 2005, 10, 'Biography'),
+    -> (102, 'C++ Programming', 2, 2008, 15, 'Programming'),
+    -> (103, 'Core Java', 3, 2010, 20, 'Programming'),
+    -> (104, 'The Life', 1, 2015, 5, 'Novel'),
+    -> (105, 'Database', 2, 2025, 20, 'Coding');
+
+mysql> /* 10. Insert 3 members into the Members table */
+mysql> ALTER TABLE Members
+    -> MODIFY COLUMN phone VARCHAR(15);
+mysql> INSERT INTO Members (member_id, name, email, phone)
+    -> VALUES
+    -> (1, 'Rahul Patil', 'rahul@gmail.com', '1234567890'),
+    -> (2, 'Pawan Shinde', 'pawan@gmail.com', '9876543210'),
+    -> (3, 'Aditya Kamble', 'Aditya@gmail.com', '2314569487');
+mysql> /* 11. Insert 4 borrow records into the Borrow_Records table */
+mysql> INSERT INTO Borrow_Records (record_id, member_id, book_id, borrow_date, return_date)
+         -> VALUES
+         -> (1, 2, 101, '2026-10-01', '2026-10-05'),
+         -> (2, 3, 102, '2026-10-03', '2026-10-10'),
+         -> (3, 1, 103, '2026-10-08', NULL),
+         -> (4, 2, 104, '2026-10-10', NULL);
+
+mysql> /* 12. Write an SQL query to select all books where published_year is after 2015 */
+mysql> select * from books where published_year > 2015
+
+Mysql> /*13. Write a SQL query to create a foreign key & primary key relationship between two tables */
+CREATE TABLE Authors (
+author_id Int Primary Key,
+name VARCHAR(100), 
+country VARCHAR(50)
+);
+
+CREATE TABLE Books (
+    -> book_id INT PRIMARY KEY,
+    -> title VARCHAR(150),
+    -> author_id INT,
+    -> published_year YEAR,
+    -> available_copies INT,
+    -> FOREIGN KEY (author_id) REFERENCES Authors(author_id)
+    -> );
+
+mysql> /* 14. Write an SQL query to find all members who have borrowed the book with title 'Database Systems' */
+mysql> SELECT DISTINCT m.*
+    -> FROM Members m
+    -> JOIN Borrow_Records br
+    -> ON m.member_id = br.member_id
+    -> JOIN Books b
+    -> ON br.book_id = b.book_id
+    -> WHERE b.title = 'Database Systems';
+Empty set (0.01 sec)
+
+mysql> /* 15. Update the available_copies column of a specific book (choose any book) by reducing it by 1 after it is  borrowed */
+mysql> UPDATE Books
+    -> SET available_copies = available_copies - 1
+    -> WHERE book_id = 101;
+
+mysql> /* 16. Delete a record from Members where member_id = 3 */
+mysql> DELETE FROM Borrow_Records WHERE member_id = 3;
+mysql> DELETE FROM Members WHERE member_id = 3;
+
+mysql> /* 17. Update a Book name record from Book table with id = 1 */
+mysql> UPDATE Books
+    -> SET title = 'MySQL Database'
+    -> WHERE book_id = 105;
+
+mysql> /* 18. Write an SQL query to list all books along with their authors' names */
+mysql> SELECT Books.title, Authors.name
+    -> FROM Books
+    -> INNER JOIN Authors
+    -> ON Books.author_id = Authors.author_id;
+
+mysql> /* 19. Write an SQL query to delete all books from the Books table where the published_year is before 2000 */
+mysql> delete from books where published_year < 2000;
+
+mysql> /* 20. Write an SQL query to find all books that are never borrowed (i.e., no records in Borrow_Records) */
+mysql> SELECT * FROM Books
+    -> WHERE book_id NOT IN (
+    -> SELECT book_id FROM Borrow_Records
+    -> );
